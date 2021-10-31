@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite tests="5" failures="0" name="com.JPQLTest" time="0.208" errors="0" skipped="0">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="F:\study\java\JDK\jre\bin"/>
+    <property name="java.vm.version" value="25.131-b11"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="maven.multiModuleProjectDirectory" value="F:\study\java\IdeaProjects\maven_springMicroservice"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="path.separator" value=";"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.script" value=""/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="F:\study\java\IdeaProjects\maven_springMicroservice"/>
+    <property name="java.runtime.version" value="1.8.0_131-b11"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="F:\study\java\JDK\jre\lib\endorsed"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.io.tmpdir" value="C:\Users\26762\AppData\Local\Temp\"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.variant" value=""/>
+    <property name="os.name" value="Windows 10"/>
+    <property name="archetypeCatalog" value="internal"/>
+    <property name="classworlds.conf" value="E:\Applications\apache-maven-3.6.1\bin\m2.conf"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.library.path" value="F:\study\java\JDK\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;E:\xiazai\oracle\oracleexe\app\oracle\product\10.2.0\server\bin;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\iCLS\;C:\Program Files\Intel\Intel(R) Management Engine Components\iCLS\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;F:\study\java\JDK\bin;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\dotnet\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;E:\xiazai\python\;E:\xiazai\python\Scripts\;E:\Applications\Mysql\bin;E:\xiazai\hyxd;E:\xiazai\Git\Git\cmd;E:\xiazai\TortoiseGit\bin;E:\Applications\apache-maven-3.6.1\bin;C:\Program Files\Microsoft SQL Server\120\DTS\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\110\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files\Microsoft SQL Server\120\Tools\Binn\;C:\Program Files (x86)\Microsoft SQL Server\120\Tools\Binn\ManagementStudio\;C:\Program Files (x86)\Microsoft SQL Server\120\DTS\Binn\;F:\study\java\gradle\gradle-4.6\bin;E:\xiazai\VisualSVN-Server\bin;E:\xiazai\TortoiseSVN\bin;E:\xiazai\python\Scripts\;E:\xiazai\python\;C:\Users\26762\AppData\Local\Microsoft\WindowsApps;;."/>
+    <property name="maven.conf" value="E:\Applications\apache-maven-3.6.1/conf"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="52.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="maven.repo.local" value="F:\study\java\maven_repository"/>
+    <property name="os.version" value="10.0"/>
+    <property name="user.home" value="C:\Users\26762"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="user.name" value="26762"/>
+    <property name="java.class.path" value="E:\Applications\apache-maven-3.6.1\boot\plexus-classworlds-2.6.0.jar;E:\xiazai\Ideajava\IntelliJ IDEA 2019.1.2\lib\idea_rt.jar"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="F:\study\java\JDK\jre"/>
+    <property name="sun.java.command" value="org.codehaus.classworlds.Launcher -Didea.version2019.1.2 -s E:\Applications\apache-maven-3.6.1\conf\settings.xml -Dmaven.repo.local=F:\study\java\maven_repository install"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.language" value="zh"/>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="idea.version2019.1.2" value="true"/>
+    <property name="java.version" value="1.8.0_131"/>
+    <property name="java.ext.dirs" value="F:\study\java\JDK\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext"/>
+    <property name="sun.boot.class.path" value="F:\study\java\JDK\jre\lib\resources.jar;F:\study\java\JDK\jre\lib\rt.jar;F:\study\java\JDK\jre\lib\sunrsasign.jar;F:\study\java\JDK\jre\lib\jsse.jar;F:\study\java\JDK\jre\lib\jce.jar;F:\study\java\JDK\jre\lib\charsets.jar;F:\study\java\JDK\jre\lib\jfr.jar;F:\study\java\JDK\jre\classes"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="maven.home" value="E:\Applications\apache-maven-3.6.1"/>
+    <property name="file.separator" value="\"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.desktop" value="windows"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+  </properties>
+  <testcase classname="com.JPQLTest" name="testFindAll" time="0.153"/>
+  <testcase classname="com.JPQLTest" name="testCount" time="0.026"/>
+  <testcase classname="com.JPQLTest" name="testPage" time="0.004"/>
+  <testcase classname="com.JPQLTest" name="testCondition" time="0.01"/>
+  <testcase classname="com.JPQLTest" name="testOrders" time="0.015"/>
+</testsuite>

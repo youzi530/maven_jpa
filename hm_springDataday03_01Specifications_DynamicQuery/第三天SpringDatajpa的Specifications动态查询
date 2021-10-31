@@ -1,0 +1,153 @@
+一、Specifications动态查询
+    1、搭建环境：
+        a、新建一个dao：实现两个接口，然后什么都不写
+        b、书写一个测试类：SpecTest类
+    2、在测试类中：
+        a、实例：
+             Specification<Customer> spec = new Specification<Customer>() {
+                public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                    return null;
+                }
+             };
+        b、自定义查询条件:
+            1、实现Specification接口（提供泛型，查询的对象类型）
+            2、实现toPredicate方法（构造查询条件）
+            3、需要借助方法参数中的两个参数：
+                root：获取需要查询的对象属性
+                CriteriaBuilder:构造查询条件的，内部封装了很多的查询条件（模糊匹配、精准匹配）
+    3、匿名内部类的写法：
+        Specification<Customer> spec = new Specification<Customer>() {
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //1、获取比较的属性名称:root
+                Path<Object> custName = root.get("custName");
+                //2、构造查询方式:CriteriaBuilder:    select * from cst_customer where cust_name = '凌巧'
+                Predicate pr = criteriaBuilder.equal(custName, "凌巧");//进行精准匹配（比较的属性，比较的属性值）
+                return pr;
+            }
+        };
+        Customer customer = customerdao.findOne(spec);
+        System.out.println(customer);
+
+二、多条件的查询：
+    /**
+     * 多条件的查询
+     *      案例：根据客户名和客户名称来查询
+     *      1、 比较的属性名称:root
+     *          custName：客户名
+     *          custIndustry：客户行业
+     *      2、查询方式:CriteriaBuilder:
+     *          构造客户名的精准匹配查询
+     *          构造所属行业的精准匹配查询
+     *          将以上两个查询联系起来
+     */
+    public void  testSpec1(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //1、比较的属性名称:root
+                Path<Object> custName = root.get("custName");
+                Path<Object> custIndustry = root.get("custIndustry");
+                //2、查询方式:CriteriaBuilder:
+                Predicate p1 = criteriaBuilder.equal(custName, "凌巧");
+                Predicate p2 = criteriaBuilder.equal(custIndustry, "互联网行业");
+                //将多个查询条件组合一起：
+                Predicate and = criteriaBuilder.and(p1, p2);
+                return and;
+            }
+        };
+        Customer customer = customerdao.findOne(spec);
+        System.out.println(customer);
+    }
+
+三、完成根据客户名称的模糊查询
+    @Test
+    public void testSpec3(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //1、比较的属性名称:root
+                Path<Object> custName = root.get("custName");
+                //2、查询方式:CriteriaBuilder:
+                Predicate like = criteriaBuilder.like(custName.as(String.class),"凌巧%");
+                return like;
+            }
+        };
+        List<Customer> customers = customerdao.findAll(spec);
+        for (Customer c:customers
+             ) {
+            System.out.println(c);
+        }
+    }
+
+四、排序的查询
+    @Test
+    public void testSpec4(){
+        Specification<Customer> spec = new Specification<Customer>() {
+            public Predicate toPredicate(Root<Customer> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                //1、比较的属性名称:root
+                Path<Object> custName = root.get("custName");
+                //2、查询方式:CriteriaBuilder:
+                Predicate like = criteriaBuilder.like(custName.as(String.class),"凌巧%");
+                return like;
+            }
+        };
+        /**
+         *  创建排序对象,需要调用构造方法实例化对象
+         *      第一个参数：排序的顺序
+         *          Sort.Direction.DESC
+         *          Sort.Direction.ASC
+         *      第二个参数：排序的属性名称
+         */
+        Sort sort = new Sort(Sort.Direction.DESC,"custId");
+        List<Customer> customers = customerdao.findAll(spec,sort);
+        for (Customer c:customers
+        ) {
+            System.out.println(c);
+        }
+    }
+
+五、分页操作：
+    /**
+     *  分页查询
+     *      findAll(Specification,  Pageable);
+     *          Specification：查询条件
+     *          Pageable：分页参数：查询的页码、每页查询的条数
+     *      返回:Page(springDataJpa为我们封装好了pageBean对象，数据列表，共条数)
+     *
+     *      创建PageRuqest的过程中，需要调用他的构造方法传入两个参数：
+     *          第一个参数：当前查询的页数
+     *          第二个参数：每页查询的数量
+     */
+    @Test
+    public void testSpec5(){
+        Specification specification = null;
+        Pageable pageable = new PageRequest(0,2);
+
+        Page<Customer> page = customerdao.findAll(null, pageable);
+        System.out.println(page.getTotalElements()); //得到总条数
+
+        System.out.println(page.getTotalPages());//得到总页数
+        System.out.println(page.getContent());//得到数据集合列表
+    }
+
+六、总结：
+    1、paSpecificationExecutor 方法列表
+        T findOne(Specification<T> spec);  //查询单个对象
+        List<T> findAll(Specification<T> spec);  //查询列表
+
+        //查询全部，分页
+        //pageable：分页参数
+        //返回值：分页pageBean（page：是springdatajpa提供的）
+        Page<T> findAll(Specification<T> spec, Pageable pageable);
+
+        //查询列表
+        //Sort：排序参数
+        List<T> findAll(Specification<T> spec, Sort sort);
+
+        long count(Specification<T> spec);//统计查询
+
+    2、Specification ：查询条件
+        自定义我们自己的Specification实现类
+            实现
+            //root：查询的根对象（查询的任何属性都可以从根对象中获取）
+            //CriteriaQuery：顶层查询对象，自定义查询方式（了解：一般不用）
+            //CriteriaBuilder：查询的构造器，封装了很多的查询条件
+            Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb); //封装查询条件

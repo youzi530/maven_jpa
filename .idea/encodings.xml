@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springBootday01_01Springboot_Demo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday01_01JPA_Demo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday02_01SpringDataJPA_Demo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday02_02jpql_sql_Query_Demo" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday03_01Specifications_DynamicQuery" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday03_02OneToMany_Tables" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday03_03ManyToMany_Tables" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/hm_springDataday03_04Object_Query" charset="UTF-8" />
+  </component>
+</project>

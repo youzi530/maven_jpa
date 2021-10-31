@@ -1,0 +1,112 @@
+
+第三、使用jpql来操作：
+    1、介绍：查询的是类中或者类中属性
+    2、需要将jpql语句配置到接口方法上
+        a、特有的查询，需要再dao接口上配置方法
+        b、在新添加得方法上，使用注解的形式配置jpql查询语句
+        c、注解：@Query
+            public interface CustomerDao extends JpaRepository<Customer, Long> , JpaSpecificationExecutor<Customer> {
+                /**
+                 * 根据客户名查询客户
+                 *      使用jpql的方式查询
+                 *      jpql：from Customer where custName = ?
+                 */
+                @Query(value = "from Customer where custName = ?")
+                public Customer findByName(String custName);
+            }
+        d、书写测试类
+
+     3、jpql查询操作:
+        a、对于多个占位符参数:
+            可以指定占位符参数的位置：（? 索引的方式）：指定此占位的取值来源
+            @Query(value = "from Customer where custName = ?1 and custId = ?2")
+            public Customer findCustomerByNameAndId(String name,Long id);
+
+     4、jpql更新操作:
+        a、@Query 是用于查询，而不是更新，怎么办？
+            在下面加注解@Modifying（在CustomerDao接口里面）
+            @Query(value = "update  Customer set custName = ?2 where custId = ?1")
+            @Modifying
+            public void updateCustomer(long custId,String custName);
+        b、还必须添加事务才可以使用：
+            @Test
+            @Transactional
+            public void testUpdateCustomer() {
+                customerDao.updateCustomer(4l,"凌巧大帅哥");
+            }
+        c、但是上面两步之后，执行不会报错，但是数据库没更新数据！
+            因为没有提交事务，而是默认执行结束后，回滚事务，需要关闭默认回滚
+            @Test
+            @Transactional
+            @Rollback(value = false)
+            public void testUpdateCustomer() {
+                customerDao.updateCustomer(4l,"凌巧大帅哥");
+            }
+
+第四、使用sql来操作：
+    1、特有的查询，需要再dao接口上配置方法
+    2、在新添加得方法上，使用注解的形式配置sql查询语句
+    3、注解：@Query：
+            value：joql语句|sql语句
+            nativeQuery：false（使用jpql查询）|true（使用本地查询：sql查询）---是否使用本地查询
+    4、使用案例
+
+第五、使用方法名称规则来查询：
+    1、使用方法名称规则来默认简单查询
+        a、介绍：
+            对jpql查询，更加深入的封装，我们只要按照spirngDataJpa提供的方法名称规则定义方法，不需要再去配置joql语句，完成查询
+        b、使用：
+            （findBy+对象中的属性名）:查询
+                    findByCustName(对象中的属性名首字母大写):根据客户名称查询
+        c、原理：
+            在springDataJpa运行阶段，会根据方法名称进行解析：find from xxx(实体类) 属性名称 where custName =
+        d、实例：
+            a、在dao里面：
+                public Customer findByCustName(String custName);
+            b、在test类中：
+                @Test
+                public void testFindByCustName() {
+                    Customer c = customerDao.findByCustName("凌巧");
+                    System.out.println(c);
+                }
+
+    2、使用方法名称规则来模糊查询：
+        a、使用：findBy+属性民称+查询方式（like|isnull）
+            findByCustNameLike
+        b、实例：
+            a、在dao里面：
+                public List<Customer> findByCustNameLike(String custName);
+            b、在test类中：
+                @Test
+                public void testFindByCustNameLike() {
+                    List<Customer> customers = customerDao.findByCustNameLike("凌巧");
+                    for (Customer customer:customers) {
+                        System.out.println(customer);
+                    }
+                }
+
+    3、使用方法名称规则来多条件查询：
+        a、使用：findBy+属性民称+查询方式（like|isnull）+多条件的连接符（and|or）+属性名+其他查询方式
+            findByCustNameLikeAndCustIndustry
+        b、实例：
+            a、在dao里面：
+                public List<Customer> findByCustNameLikeAndCustIndustry(String custName,String custIndustry);
+            b、在test类中：
+                @Test
+                public void testFindByCustNameLikeAndCustIndustry() {
+                    List<Customer> customers = customerDao.findByCustNameLikeAndCustIndustry("凌巧","互联网行业");
+                    for (Customer customer:customers) {
+                        System.out.println(customer);
+                    }
+                }
+
+====================================================================
+回顾
+	i.springDatajpa，jpa规范，hibernate三者之间的关系
+		code  -- > springDatajpa  --> jpa规范的API --> hibernate
+	ii.符合springDataJpa规范的dao层接口的编写规则
+		1.需要实现两个接口（JpaRepository，JapSpecificationExecutor）
+		2.提供响应的泛型
+	iii.运行过程
+		* 动态代理的方式：动态代理对象
+	iiii.查询

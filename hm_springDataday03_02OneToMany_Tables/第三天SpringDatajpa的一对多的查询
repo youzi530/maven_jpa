@@ -1,0 +1,141 @@
+一、表关系
+    一对一
+    一对多：
+        一的一方：主表
+        多的一方：从表
+        外键：需要再从表上新建一列作为外键，他的取值来源于主表的主键
+    多对多：
+        中间表：中间表中最少应该由两个字段组成，这两个字段做为外键指向两张表的主键，又组成了联合主键
+
+二、实体类中的关系：
+    1、包含关系：可以通过实体类中的包含关系描述表关系
+    2、继承关系
+
+    分析步骤：
+        a、明确表与表之间的关系
+        b、确定表关系（描述）
+        c、编写实体类，在实体类中描述表关系（包含关系）
+        d、配置实体类和数据库的映射关系
+
+三、完成多表操作：
+    1、一对多的操作：
+        案例：客户和联系人的案例
+            客户：一家公司
+            联系人：这家公司的员工的，负责与我们对接
+            所以一个客户可以具有多个联系人
+                一个联系人从属于一家公司
+        分析步骤：
+            a、明确表与表之间的关系：一对多的关系
+            b、确定表关系（描述）：
+                主表：客户表
+                从表：联系人表：从表上添加外键
+            c、编写实体类，在实体类中描述表关系（包含关系）
+                客户实体类：包含多个联系人，在客户实体类中包含一个联系人集合
+                联系人实体类：包含1个客户，在联系人的实体类包含一个客户对象
+            d、配置实体类和数据库的映射关系：
+                使用jpa注解配置一对多的映射关系
+
+        案例代码：
+            a、客户实体类：包含多个联系人，在客户实体类中包含一个联系人集合
+                /**
+                 * 使用注解的形式配置多表关系
+                 *      1、声明关系
+                 *          @OneToMany(targetEntity = LinkMan.class)
+                 *          targetEntity：对方对象的字节码文件
+                 *      2、配置外键（中间表）
+                 *          @JoinColumn(name = "lkm_cust_id",referencedColumnName = "cust_id")
+                 *          name：外键字段名称
+                 *          referencedColumnName：参照的主表的主键字段名称
+                 */
+                 @OneToMany(targetEntity = LinkMan.class)
+                 @JoinColumn(name = "lkm_cust_id",referencedColumnName = "cust_id")
+                 private Set<LinkMan> linkMans = new HashSet<LinkMan>();
+
+            b、联系人实体类：包含1个客户，在联系人的实体类包含一个客户对象
+                 /**
+                 * 配置联系人到客户的多对一关系
+                 *      使用注解的形式配置多对一关系
+                 *          1、配置表关系
+                 *              @ManyToOne(targetEntity = Customer.class)
+                 *          2、配置外键（中间表）
+                 *              @JoinColumn(name = "lkm_cust_id",referencedColumnName = "cust_id")
+                 * @return
+                 */
+                @ManyToOne(targetEntity = Customer.class)
+                @JoinColumn(name = "lkm_cust_id",referencedColumnName = "cust_id")
+                private Customer customer;
+
+            c、完善配置文件：
+                <!--注入jpa的配置信息
+                    加载jpa的基本配置信息和jpa实现方式的配置信息（hebernate）
+                     hibernate.hbm2ddl.auto : 自动创建数据库表
+                        create ： 每次都会重新创建数据库表
+                        update：有表不会重新创建，没有表会重新创建表
+                -->
+                <property name="jpaProperties">
+                    <props>
+                        <prop key="hibernate.hbm2ddl.auto">create</prop>
+                    </props>
+                </property>
+
+            d、编写测试类：
+                问题：我到底该去怎么维护这个关系呢？
+                    会有一条多余的update语句
+                       由于一的一方可以维护外键：会发送update语句
+                       解决此问题：只需要在一的一方放弃维护权即可----在customer的这方！！！
+
+                       //OneToMany(targetEntity = LinkMan.class)
+                       //@JoinColumn(name = "lkm_cust_id",referencedColumnName = "cust_id")
+                       @OneToMany(mappedBy = "customer")
+                       private Set<LinkMan> linkMans = new HashSet<LinkMan>();
+
+    2、一对多的删除：
+        删除多的那方，随便删除，但是一的一方，我们该怎么删除？
+            默认情况，会置空，就是删除主表，从表中的外键就变空
+            不默认：拒绝删除
+            解决办法：级联删除（操作一个对象同时操作与之相关联的对象）
+
+            案例：当保存一个客户的时候同时保存所有联系人
+                 当删除一个客户，将他相关的联系人全部删除
+            分析：
+                1、需要区分操作的主体
+                2、需要再操作主体的实体类上，添加级联属性（需要添加到多表映射关系的注解上）
+                3、cascade（配置级联）
+                    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
+                    private Set<LinkMan> linkMans = new HashSet<LinkMan>();
+            代码：
+                1、保存：
+                    @Test
+                    @Transactional
+                    @Rollback(false)
+                    public void testCascadeAdd(){
+                        Customer customer = new Customer();
+                        customer.setCustName("百度1");
+                        LinkMan linkMan = new LinkMan();
+                        linkMan.setLkmName("小李1");
+
+                        linkMan.setCustomer(customer);//由于配置了多的一方到一的一方的关联关系（当保存的时候，就已经对外键赋值）
+                        customer.getLinkMans().add(linkMan);//由于配置了一的一方到多的一方的关联关系（发送一条update语句）
+
+                        customerDao.save(customer);
+                    }
+                2、删除：（需要改配置文件中的create为update，不自动删除表）
+                    @Test
+                    @Transactional
+                    @Rollback(false)
+                    public void testCascadeDelete(){
+                        //查询一号客户
+                        Customer customer = customerDao.findOne(1l);
+                        //删除一号客户
+                        customerDao.delete(customer);
+                    }
+
+            解释、
+                CascadeType.all: 所有
+                       MERGE：更新
+                       PERSIST：保存
+                       REMOVE：删除
+
+    3、多对多的操作：
+
+    4、

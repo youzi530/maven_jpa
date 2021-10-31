@@ -1,0 +1,260 @@
+springdatajpa
+	day1:orm思想和hibernate以及jpa的概述和jpa的基本操作
+	day2：springdatajpa的运行原理以及基本操作
+	day3：多表操作，复杂查询
+
+第一 orm思想
+	主要目的：操作实体类就相当于操作数据库表
+	建立两个映射关系：
+		实体类和表的映射关系
+		实体类中属性和表中字段的映射关系
+	不再重点关注：sql语句
+
+	实现了ORM思想的框架：mybatis，hibernate
+
+第二 hibernate框架介绍
+	Hibernate是一个开放源代码的对象关系映射框架，
+		它对JDBC进行了非常轻量级的对象封装，
+		它将POJO与数据库表建立映射关系，是一个全自动的orm框架
+
+第三 JPA规范
+	jpa规范，实现jpa规范，内部是由接口和抽象类组成
+
+第四 jpa的基本操作
+	案例：是客户的相关操作（增删改查）
+		客户：就是一家公司
+	客户表：
+===============================================================================
+
+	jpa操作的操作步骤
+		1.加载配置文件创建实体管理器工厂
+			Persisitence：静态方法（根据持久化单元名称创建实体管理器工厂）
+				createEntityMnagerFactory（持久化单元名称）
+			作用：创建实体管理器工厂
+
+		2.根据实体管理器工厂，创建实体管理器
+			EntityManagerFactory ：获取EntityManager对象
+			方法：createEntityManager
+			* 内部维护的很多的内容
+				内部维护了数据库信息，
+				维护了缓存信息
+				维护了所有的实体管理器对象
+				再创建EntityManagerFactory的过程中会根据配置创建数据库表
+			* EntityManagerFactory的创建过程比较浪费资源
+			特点：线程安全的对象
+				多个线程访问同一个EntityManagerFactory不会有线程安全问题
+			* 如何解决EntityManagerFactory的创建过程浪费资源（耗时）的问题？
+			思路：创建一个公共的EntityManagerFactory的对象
+			* 静态代码块的形式创建EntityManagerFactory
+
+		3.创建事务对象，开启事务
+			EntityManager对象：实体类管理器
+				beginTransaction : 创建事务对象
+				presist ： 保存
+				merge  ： 更新
+				remove ： 删除
+				find/getRefrence ： 根据id查询
+
+			Transaction 对象 ： 事务
+				begin：开启事务
+				commit：提交事务
+				rollback：回滚
+		4.增删改查操作
+		5.提交事务
+		6.释放资源
+
+	i.搭建环境的过程
+		1.创建maven工程导入坐标
+		2.需要配置jpa的核心配置文件
+			*位置：配置到类路径下的一个叫做 META-INF 的文件夹下
+			*命名：persistence.xml
+		3.编写客户的实体类
+		4.配置实体类和表，类中属性和表中字段的映射关系
+		5.保存客户到数据库中
+	ii.完成基本CRUD案例
+		persist ： 保存
+		merge ： 更新
+		remove ： 删除
+		find/getRefrence ： 根据id查询
+
+	iii.jpql查询
+		sql：查询的是表和表中的字段
+		jpql：查询的是实体类和类中的属性
+		* jpql和sql语句的语法相似
+
+		1.查询全部
+		2.分页查询
+		3.统计查询
+		4.条件查询
+		5.排序
+
+==========================================================================================
+==========================================================================================
+一、入门案例流程：
+    1、创建maven工程导入坐标：
+        <!-- hibernate对jpa的支持包 -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${project.hibernate.version}</version>
+        </dependency>
+    2、需要配置jpa的核心配置文件:
+        a、位置：配置到类路径下的一个叫做 META-INF 的文件夹下
+        b、命名：persistence.xml
+        c、内容：
+            1·需要配置persistence-unit节点，持久化单元：
+                 ·name:持久化单元名称
+                 ·transaction-type:事务管理方式
+                     ·JTA:分布式事务管理
+                     ·RESOURCE_LOCAL:本地事务管理
+                 ·实例：<persistence-unit name="myJpa" transaction-type="RESOURCE_LOCAL"></persistence-unit>
+            2·在persistence-unit节点里面配置如下：
+                ·jpa的实现方式:
+                     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+                ·数据库信息:
+                     <properties>
+                        <property name="javax.persistence.jdbc.user" value="root"/>
+                        <property name="javax.persistence.jdbc.password" value="123456"/>
+                        <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+                        <property name="javax.persistence.jdbc.url" value="jdbc:mysql:///jpa"/>
+                    </properties>
+                ·可选配置：配置jpa实现方(hibernate)的配置信息：
+                    ·第一个：显示sql：false|true
+                            <property name="hibernate.show_sql" value="true"/>
+                    ·第二个：自动创建数据库表：hibernate.hbm2ddl.auto
+                            create ： 程序运行时创建数据库表（如果有表，先删除表再创建）
+                            update ：程序运行时创建表（如果有表，不会创建表）
+                            none ：不会创建表
+                            例子： <property name="hibernate.hbm2ddl.auto" value="update" />
+    3、编写客户的实体类:
+        a、书写属性：
+        b、编写实体类和表的映射关系:
+            1.实体类和表的映射关系
+               @Entity:声明实体类
+               @Table : 配置实体类和表的映射关系
+                  name : 配置数据库表的名称
+               例子：
+                  @Entity
+                  @Table(name = "cst_customer")
+                  public class Customer implements Serializable {...}
+        c、编写实体类中属性和表中字段的映射关系:
+               @Id:声明主键的配置
+               @GeneratedValue：配置主键的生成策略
+                   GenerationType.IDENTITY：自增
+               @Column：配置属性和字段的映射关系
+                   name：数据库表中字段的名称
+
+    4、编写测试类：
+        1、加载配置文件创建工厂（实体管理器工厂）对象
+        2、通过实体管理器工厂获取实体管理器
+        3、获取事务对象，开启事务
+        4、完成增删改查操作
+        5、提交事务（回滚事务）
+        6、资源关闭
+-----------------------------------------------------------------------------------------------------------
+二、jpa中主键生成策略：
+    @GeneratedValue：配置主键的生成策略：
+        a、GenerationType.IDENTITY：自增--底层数据库必须支持自动增长方式，对id自增(mysql)
+        b、GenerationType.SEQUENCE：序列--底层数据库必须支持序列增长方式（oracle）
+        c、GenerationType.TABLE：jpa提供一种机制，通过一张数据库表的方式帮助我们完成主键自增
+            如果使用TABLE，则需要在配置文件里面使用：<property name="hibernate.hbm2ddl.auto" value="create" />
+            他会多生成一张表来表示主键生成策略
+        d、GenerationType.AUTO：程序自动帮助我们选择主键生成策略
+            如果使用AUTO，则需要在配置文件里面使用：<property name="hibernate.hbm2ddl.auto" value="create" />
+             他也会多生成一张表来表示主键生成策略
+
+三、jpa操作步骤：
+    1、加载配置文件创建工厂（实体管理器工厂）对象--根据持久化名称创建实体管理器工厂
+        EntityManagerFactory factory = Persistence.createEntityManagerFactory("myJpa");
+    2、通过实体管理器工厂获取实体管理器：EntityManager是线程安全的对象，多个线程访问一个EntityManager，不会有线程安全问题
+        内部维护了许多内容：
+            数据库信息
+            缓存信息
+            维护所有实体管理器对象
+        EntityManager em = factory.createEntityManager();
+    3、获取事务对象，开启事务
+        EntityTransaction tx = em.getTransaction(); //获取事务对象
+        tx.begin();
+    4、完成增删改查操作
+        Customer customer = new Customer();
+        customer.setCustName("凌巧");
+        customer.setCustIndustry("互联网行业");
+        em.persist(customer);
+    5、提交事务（回滚事务）
+        tx.commit();
+    6、资源关闭
+        em.close();
+        factory.close();
+
+
+四、如何解决EntityManagerFactory的创建过程浪费资源（耗时）的问题？
+    思路：创建一个公共的EntityManagerFactory的对象
+        * 静态代码块的形式创建EntityManagerFactory
+        public class JpaUtils {
+            private static EntityManagerFactory factory; //只创建一次
+            static {
+                factory = Persistence.createEntityManagerFactory("myJpa");
+            }
+            /**
+             * 获取EntityManager对象
+             */
+            public static EntityManager getEntityManager(){
+                return factory.createEntityManager();
+        }}
+
+五、 EntityManager对象：实体类管理器
+          beginTransaction : 创建事务对象
+          presist ： 保存
+          merge  ： 更新
+          remove ： 删除
+          find/getRefrence ：根据id查询
+              find:两个参数：
+                  ·第一个参数class，查询数据的结果需要包装实体类类型的字节码
+                  ·第二个参数id，查询的主键的取值
+              getRefrence：两个参数：
+                  ·第一个参数class，查询数据的结果需要包装实体类类型的字节码
+                  ·第二个参数id，查询的主键的取值
+              区别：使用find方法查询：立即加载
+                        查询的对象就是当前的客户对象本身，在调用find方法时候，就会发送sql语句查询数据库
+                   使用getRefrence方法查询：延迟加载
+                        查询的对象是动态代理对象，调用getRefrence方法的时候，不会立即发送sql语句查询数据库
+                        当调用查询结果对象的时候，才会发送查询的sql语句：什么时候用，什么时候就发送sql查询数据库
+
+六、 Transaction 对象 ： 事务
+          begin：开启事务
+          commit：提交事务
+          rollback：回滚
+
+七、jpql查询：jpa查询语句
+    sql：查的是数据库表中的字段
+    jpql：查的是实体类中的属性
+
+    使用步骤：
+        1、创建query查询对象
+        2、对参数赋值
+        3、查询，并得到返回结果
+
+    实例：
+        1、查询全部
+            String jpql = "from Customer";
+            Query query = entityManager.createQuery(jpql);//1、创建query查询对象
+            List list = query.getResultList();//发送查询，并封装结果集
+        2、倒序查询
+            String jpql = "from Customer order by custId desc";
+            Query query = entityManager.createQuery(jpql);
+            List list = query.getResultList();//发送查询，并封装结果集
+        3、统计查询
+            String jpql = "select count(custId) from Customer";
+            Query query = entityManager.createQuery(jpql);
+            Object singleResult = query.getSingleResult();//发送查询，并封装结果集
+        4、分页查询
+            String jpql = "from Customer";
+                // 1、创建query查询对象
+            Query query = entityManager.createQuery(jpql);
+                //2、对参数赋值：分页参数（起始索引、最大查询条数）
+            query.setFirstResult(0); //起始索引
+            query.setMaxResults(2);//最大查询条数
+                //3、发送查询，并封装结果集
+            List list = query.getResultList();
+        5、条件查询
+

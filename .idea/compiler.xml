@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="hm_springDataday02_01SpringDataJPA_Demo" />
+        <module name="hm_springDataday02_02jpql_sql_Query_Demo" />
+        <module name="hm_springDataday03_01Specifications_DynamicQuery" />
+        <module name="hm_springDataday01_01JPA_Demo" />
+        <module name="hm_springDataday03_03ManyToMany_Tables" />
+        <module name="hm_springDataday03_02OneToMany_Tables" />
+        <module name="hm_springDataday03_04Object_Query" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="hm_springBootday01_01Springboot_Demo" target="1.5" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

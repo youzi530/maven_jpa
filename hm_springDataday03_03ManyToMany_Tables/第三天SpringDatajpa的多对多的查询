@@ -1,0 +1,42 @@
+一、多对多的关系:
+    比如：用户和角色
+        一个用户对应多个角色
+        一个角色对应多个用户
+    1、分析步骤：
+          a、明确表与表之间的关系：多对多的关系
+          b、确定表关系（描述）：
+              中间表
+          c、编写实体类，在实体类中描述表关系（包含关系）
+              用户实体类：包含多个角色，在用户实体类中包含角色集合
+              角色实体类：包含多个用户，在 角色的实体类包含用户集合
+          d、配置实体类和数据库的映射关系：
+              使用jpa注解配置多对多的映射关系
+
+    2、具体代码书写：
+        a、在User实体类中：
+             /**
+              * 配置用户到角色的多对多关系
+              *      1、声明表关系:
+              *          @ManyToMany(targetEntity = Role.class)
+              *      2、配置中间表:(两个外键)
+              *          @JoinTable(name = "sys_user_role",
+              *             joinColumns = {@JoinColumn(name = "",referencedColumnName ="" )},
+              *             inverseJoinColumns = {@JoinColumn(name = "",referencedColumnName = "")}
+              *          )
+              *                @JoinTable
+              *                  name : 中间表的名称
+              *                  joinColumns：配置当前对象在中间表的外键
+              *                      @JoinColumn的数组
+              *                          name：外键名
+              *                          referencedColumnName：参照的主表的主键名
+              *                  inverseJoinColumns：配置对方对象在中间表的外键
+              * @return
+              */
+             @ManyToMany(targetEntity = Role.class)
+             @JoinTable(name = "sys_user_role",
+                     //joinColumns,当前对象在中间表中的外键,referencedColumnName为当前对象的主键
+                 joinColumns = {@JoinColumn(name = "sys_user_id",referencedColumnName ="user_id" )},
+                     //inverseJoinColumns，对方对象在中间表的外键,referencedColumnName为当前对象的主键
+                 inverseJoinColumns = {@JoinColumn(name = "sys_role_id",referencedColumnName = "role_id")}
+             )
+             private Set<Role> roles = new HashSet<Role>();

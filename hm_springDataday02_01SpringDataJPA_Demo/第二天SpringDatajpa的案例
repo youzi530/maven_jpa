@@ -1,0 +1,102 @@
+一、入门案例：
+    1、搭建环境：
+        创建工程导入工程
+    2、配置spring配置文件：（都交给spring管理，配置springDataJpa的整合）
+        1、改下头部信息
+        2、创建entityManagerFactory对象交给spring容器管理
+            <bean id="entityManagerFactoty" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+            c、dataSource:
+                <property name="dataSource" ref="dataSource"></property>
+            d、packagesToScan：配置的扫描的包（实体类所在的包）
+                <property name="packagesToScan" value="com"></property>
+            e、配置jpa的实现厂家hebnate:
+                <property name="persistenceProvider">
+                    <bean class="org.hibernate.jpa.HibernatePersistenceProvider"></bean>
+                </property>
+            f、jpa的供应商适配器:
+                <property name="jpaVendorAdapter">
+                    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                        <!--配置是否自动创建数据库表 -->
+                        <property name="generateDdl" value="false" />
+                        <!--指定数据库类型 -->
+                        <property name="database" value="MYSQL" />
+                        <!--数据库方言：支持的特有语法 -->
+                        <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect" />
+                        <!--是否显示sql -->
+                        <property name="showSql" value="true" />
+                    </bean>
+                </property>
+                解释:
+                    generateDdl:是否自动创建数据库表
+                    database：指定数据库类型：MYSQL、ORACLE
+                    databasePlatform:数据库方言：支持的特有语法; 比如分页：mysql用limit，而oracle用rownum
+                        org.hibernate.dialect.Oracle10gDialect
+                        org.hibernate.dialect.MySQLDialect
+                    showSql:是否显示sql
+            g、jpa的方言 ：高级的特性:
+                <property name="jpaDialect" >
+                    <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect" />
+                </property>
+            </bean>
+        3、创建数据库连接池：
+            <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+                <property name="user" value="root"></property>
+                <property name="password" value="123456"></property>
+                <property name="jdbcUrl" value="jdbc:mysql:///jpa" ></property>
+                <property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+            </bean>
+        4、整合spring Data jpa
+            <jpa:repositories base-package="com.dao" transaction-manager-ref="transactionManager"
+                entity-manager-factory-ref="entityManagerFactoty"></jpa:repositories>
+        5、配置事务管理器
+            <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+                <property name="entityManagerFactory" ref="entityManagerFactoty"></property>
+            </bean>
+        6、声明式事务：省略
+        7、配置包扫描:开启注解
+            <context:component-scan base-package="com" ></context:component-scan>
+
+    3、编写实体类，使用jpa注解配置映射关系
+
+    4、编写一个dao层接口，不需要编写dao层接口的实现类：============核心==========
+        a、dao层的接口规范
+            1、需要继承JpaRepository接口
+            2、需要继承JpaSpecificationExecutor接口
+            3、需要提供响应的泛型
+            public interface CustomerDao extends JpaRepository<Customer, Long> , JpaSpecificationExecutor<Customer> {}
+    5、编写一个测试类测试下：
+        a、声明spring提供的单元测试环境
+        b、指定spring容器的配置信息
+            @RunWith(SpringJUnit4ClassRunner.class)  //声明spring提供的单元测试环境
+            @ContextConfiguration(locations = "classpath:applicationContext.xml")//指定spring容器的配置信息
+            public class testJpaDao {....}
+        c、编写测试方法：
+            @Autowired
+            private CustomerDao customerDao;
+            /**
+             * 根据id查询
+             */
+            @Test
+            public void testFindOne() {
+                Customer customer = customerDao.findOne(4l);
+                System.out.println(customer);
+            }
+        d、涉及的方法：
+            save(customer):保存或者更新（依据：传递的实体类对象中，是否包含id属性）
+            delete（id） ：根据id删除
+            findAll() : 查询全部
+            count:查询统计条数
+
+            findOne（id） ：根据id查询
+                em.find():立即加载
+
+            getone（id）：根据id查询
+                em.getReference:延迟加载
+                需要加@Transactional : 保证getOne正常运行
+
+
+第二、springDataJpa的运行过程和原理剖析
+	1.通过JdkDynamicAopProxy的invoke方法创建了一个动态代理对象
+	2.SimpleJpaRepository当中封装了JPA的操作（借助JPA的api完成数据库的CRUD）
+	3.通过hibernate完成数据库操作（封装了jdbc）
+
